@@ -16,7 +16,7 @@ ext_radius = 60;
 // Height of the half star
 height = 19;
 // Width of the star container
-width = 1.7;
+width = 1.5;
 // Diameter of the cable space
 cable_diam = 8;
 
@@ -56,7 +56,7 @@ module star(branches, int_radius, ext_radius, height) {
 module empty_star(branches, int_radius, ext_radius, height, width) {
 	difference() {
 		star(branches, int_radius, ext_radius, height);
-		translate([0, 0, -width])
+		translate([0, 0, -width*1.1])
 			star(branches, int_radius, ext_radius, height);
 	}
 }
@@ -67,6 +67,7 @@ module empty_star(branches, int_radius, ext_radius, height, width) {
 function strip_height() = 10;
 function strip_diam(leds) = (16.7 - 1) * leds / PI;
 function strip_diam_in(leds) = strip_diam(leds) - 1;
+function strip_diam_sup(leds) = strip_diam_in(leds);
 
 /**
  * Draw a real-size model of the LED strip
@@ -99,15 +100,17 @@ module led_star() {
 				cylinder(d = cable_diam, h = ext_radius);
 	}
 	// LED strip support
+	support_strip_height = strip_height() / 2 + 0.5;
+	support_height = support_strip_height + 2;
 	intersection() {
 		star(branches, int_radius, ext_radius, height, width);
 		difference() {
 			union() {
-				cylinder(h = height, d = strip_diam_in(branches));
-				translate([0, 0, strip_height() / 2 + 0.5])
-					cylinder(h = height, d = strip_diam_in(branches) + 1.5);
+				cylinder(h = support_height, d = strip_diam_sup(branches));
+				translate([0, 0, support_strip_height])
+					cylinder(h = support_height - support_strip_height, d = strip_diam_sup(branches) + width);
 			}
-			cylinder(h = height, d = strip_diam_in(branches)-width);
+			cylinder(h = height, d = strip_diam_sup(branches)-width);
 		}
 	}
 }
@@ -119,8 +122,8 @@ module star_blocker(shift) {
 	blocker_height = 6;
 	translate([0, 0, shift ? -blocker_height : 0]) {
 		difference() {
-			cylinder(d = strip_diam_in(branches)-width, h = blocker_height * 2);
-			cylinder(d = strip_diam_in(branches)-2*width, h = blocker_height * 2);
+			cylinder(d = strip_diam_sup(branches)-width-0.9, h = blocker_height * 2);
+			cylinder(d = strip_diam_sup(branches)-2*width-0.9, h = blocker_height * 2);
 		}
 	}
 }
