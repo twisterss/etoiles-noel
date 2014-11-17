@@ -10,11 +10,11 @@ mode = "view";
 // Number of branches of the start
 branches = 5;
 // Internal radius of the star
-int_radius = 20;
+int_radius = 21;
 // External radius of the star
 ext_radius = 60;
 // Height of the half star
-height = 19;
+height = 20;
 // Width of the star container
 width = 1.5;
 // Diameter of the cable space
@@ -65,8 +65,8 @@ module empty_star(branches, int_radius, ext_radius, height, width) {
  * Size computation for the LED strip
  */
 function strip_height() = 10;
-function strip_diam(leds) = (16.7 - 1) * leds / PI;
-function strip_diam_in(leds) = strip_diam(leds) - 1;
+function strip_diam(leds) = (16.7 - 0.2) * leds / PI;
+function strip_diam_in(leds) = strip_diam(leds) - 0.4;
 function strip_diam_sup(leds) = strip_diam_in(leds);
 
 /**
