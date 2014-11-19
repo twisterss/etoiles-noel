@@ -5,7 +5,7 @@
  */
 
 // Display mode (all, view, print1, print2)
-mode = "view";
+mode = "print1";
 
 // Number of branches of the start
 branches = 5;
@@ -16,7 +16,7 @@ ext_radius = 60;
 // Height of the half star
 height = 20;
 // Width of the star container
-width = 1.5;
+width = 2;
 // Diameter of the cable space
 cable_diam = 8;
 
@@ -56,7 +56,7 @@ module star(branches, int_radius, ext_radius, height) {
 module empty_star(branches, int_radius, ext_radius, height, width) {
 	difference() {
 		star(branches, int_radius, ext_radius, height);
-		translate([0, 0, -width*1.1])
+		translate([0, 0, -width*0.825])
 			star(branches, int_radius, ext_radius, height);
 	}
 }
@@ -119,11 +119,11 @@ module led_star() {
  * Blocker to hold both star halves
  */
 module star_blocker(shift) {
-	blocker_height = 6;
+	blocker_height = 7;
 	translate([0, 0, shift ? -blocker_height : 0]) {
 		difference() {
-			cylinder(d = strip_diam_sup(branches)-width-0.9, h = blocker_height * 2);
-			cylinder(d = strip_diam_sup(branches)-2*width-0.9, h = blocker_height * 2);
+			cylinder(d = strip_diam_sup(branches)-width-0.5, h = blocker_height * 2);
+			cylinder(d = strip_diam_sup(branches)-2*width-0.5, h = blocker_height * 2);
 		}
 	}
 }
