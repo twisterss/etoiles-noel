@@ -18,7 +18,7 @@ height = 20;
 // Width of the star container
 width = 2;
 // Diameter of the cable space
-cable_diam = 6;
+cable_diam = 5;
 
 // Resolution
 $fa = 3; // Minimum angle (lower = higher max resolution, def 12)
@@ -102,7 +102,7 @@ module led_star() {
 						rotate([0, 90, 0])
 							cylinder(d = cable_diam+width, h = ext_radius);
 				}
-				cylinder(h = support_height, d = strip_diam_sup(branches) + width);
+				cylinder(h = support_height, d = strip_diam_sup(branches) + 4*width);
 			}
 		}
 		// Cable space
