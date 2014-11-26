@@ -19,6 +19,8 @@ height = 20;
 width = 2;
 // Diameter of the cable space
 cable_diam = 5;
+// Diameter of the holding wire
+wire_diam = 2;
 
 // Resolution
 $fa = 3; // Minimum angle (lower = higher max resolution, def 12)
@@ -109,6 +111,9 @@ module led_star() {
 		translate([-ext_radius, 0, 0])
 			rotate([0, 90, 0])
 				cylinder(d = cable_diam, h = ext_radius);
+		// Holder wire space
+		translate([0.75*ext_radius, 0, 0])
+			cylinder(h = height, d = wire_diam);
 	}
 	// LED strip support
 	support_strip_height = strip_height() / 2 + 0.5;
