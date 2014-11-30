@@ -17,15 +17,19 @@
 // Minimum delay between two display states (microseconds)
 #define DISPLAY_DELAY 1000
 
-#define BUTTON_THRESHOLD 990
-#define BUTTON_IGNORED_STEPS 200
+#define BUTTON_THRESHOLD 900
+#define BUTTON_IGNORED_STEPS 1000
 
 // Avalaible modes
-#define MODES 2
+#define MODES 5
 #define MODE_WHITE 0
-#define MODE_ROTATING_COLORS 1
+#define MODE_COLORS 1
+#define MODE_BLINKING_WHITE 2
+#define MODE_SHIFTING_COLORS 3
+#define MODE_ROTATING_COLORS 4
 
 // Colors
+#define BLACK stars.color(0, 0, 0)
 #define WHITE stars.color(255, 255, 255)
 #define RED stars.color(255, 0, 0)
 #define GREEN stars.color(0, 255, 0)
@@ -42,7 +46,7 @@ bool newMode = true;
 
 // Button state
 bool buttonPushed = false;
-uint8_t buttonChangedSteps = 0;
+uint16_t buttonChangedSteps = 0;
 
 /**
  * Mix 2 colors together.
@@ -75,13 +79,14 @@ uint32_t wheel(uint8_t wheelPos) {
 }
 
 /**
- * Utility to so sometheing every n steps.
- * Returns true every n steps
+ * Utility to do something every n steps.
+ * Returns true when cleared.
+ * Returns true every n calls.
  */
-bool skipSteps(uint16_t steps) {
+bool skipSteps(uint16_t steps, bool clear) {
   static uint16_t step = 0;
   step++;
-  if (step >= steps) {
+  if (clear || step >= steps) {
     step = 0;
     return true;
   }
@@ -93,8 +98,62 @@ bool skipSteps(uint16_t steps) {
  */
 void displayWhite(bool newDisplay) {
   if (newDisplay) {
-    stars.clear(stars.color(255, 255, 255));
+    stars.clear(WHITE);
     stars.commit();
+  }
+}
+
+/**
+ * Stars are one of 5 colors
+ */
+void displayColors(bool newDisplay) {
+  const uint8_t colorsCount = 5;
+  const uint32_t colors[] = {RED, GREEN, PURPLE, YELLOW, BLUE};
+  if (newDisplay) {
+    for (uint8_t i = 0; i < STARS; i++)
+      stars.setStar(i, colors[i % colorsCount]);
+    stars.commit();
+  }
+}
+
+/**
+ * 1/3 of stars are switched off
+ * others are white
+ */
+void displayBlinkingWhite(bool newDisplay) {
+  const uint8_t stepsCount = 3;
+  static uint8_t step = 0;
+  if (newDisplay) {
+    step = 0;
+  }
+  if (skipSteps(1000, newDisplay)) {
+    for (uint8_t star = 0; star < STARS; star++) {
+      if (star % stepsCount == step)
+        stars.setStar(star, BLACK);
+      else
+        stars.setStar(star, WHITE);
+    }
+    stars.commit();
+    step = (step + 1) % stepsCount;
+  }
+}
+
+/**
+ * Stars are one of 5 colors.
+ * Colors shift periodically between stars
+ */
+void displayShiftingColors(bool newDisplay) {
+  const uint8_t colorsCount = 5;
+  const uint32_t colors[] = {RED, GREEN, PURPLE, YELLOW, BLUE};
+  static uint8_t step = 0;
+  if (newDisplay) {
+    step = 0;
+  }
+  if (skipSteps(1000, newDisplay)) {
+    for (uint8_t i = 0; i < STARS; i++)
+      stars.setStar(i, colors[(i+step) % colorsCount]);
+    stars.commit();
+    step = (step + 1) % colorsCount;
   }
 }
 
@@ -108,7 +167,7 @@ void displayRotatingColors(bool newDisplay) {
   if (newDisplay) {
     step = 0;
   }
-  if (skipSteps(20)) {
+  if (skipSteps(20, newDisplay)) {
     for (uint8_t branch = 0; branch < BRANCHES; branch++) {
       uint16_t offset = branch;
       offset<<= 8;
@@ -128,6 +187,15 @@ void display() {
   switch(currentMode) {
     case MODE_WHITE:
       displayWhite(newMode);
+      break;
+    case MODE_COLORS:
+      displayColors(newMode);
+      break;
+    case MODE_BLINKING_WHITE:
+      displayBlinkingWhite(newMode);
+      break;
+    case MODE_SHIFTING_COLORS:
+      displayShiftingColors(newMode);
       break;
     case MODE_ROTATING_COLORS:
       displayRotatingColors(newMode);
