@@ -11,7 +11,7 @@
 #define UNCONNECTED_ANALOG_PIN A1
 
 // Stars configuration
-#define STARS 3
+#define STARS 11
 #define BRANCHES 5
 
 // Minimum delay between two display states (microseconds)
@@ -21,12 +21,13 @@
 #define BUTTON_IGNORED_STEPS 1000
 
 // Avalaible modes
-#define MODES 5
-#define MODE_WHITE 0
-#define MODE_COLORS 1
-#define MODE_BLINKING_WHITE 2
-#define MODE_SHIFTING_COLORS 3
-#define MODE_ROTATING_COLORS 4
+#define MODES 6
+#define MODE_ALL 0
+#define MODE_WHITE 1
+#define MODE_COLORS 2
+#define MODE_BLINKING_WHITE 3
+#define MODE_SHIFTING_COLORS 4
+#define MODE_ROTATING_COLORS 5
 
 // Colors
 #define BLACK stars.color(0, 0, 0)
@@ -94,6 +95,30 @@ bool skipSteps(uint16_t steps, bool clear) {
 }
 
 /**
+ * Display a bit of everything
+ */
+void displayAll(bool newDisplay) {
+  static uint8_t modeIn;
+  static uint16_t duration;
+  bool newModeIn = false;
+  if (newDisplay) {
+    modeIn = 1;
+    duration = 0;
+    newModeIn = true;
+  }
+  if (duration >= 30000) {
+    modeIn+= 1;
+    if (modeIn == MODES)
+      modeIn = 1;
+    newModeIn = true;
+    duration = 0;
+  }
+  display(modeIn, newModeIn);
+  duration++;
+}
+
+
+/**
  * All stars are white
  */
 void displayWhite(bool newDisplay) {
@@ -126,7 +151,7 @@ void displayBlinkingWhite(bool newDisplay) {
   if (newDisplay) {
     step = 0;
   }
-  if (skipSteps(1000, newDisplay)) {
+  if (skipSteps(200, newDisplay)) {
     for (uint8_t star = 0; star < STARS; star++) {
       if (star % stepsCount == step)
         stars.setStar(star, BLACK);
@@ -163,44 +188,61 @@ void displayShiftingColors(bool newDisplay) {
  * all stars are identical
  */
 void displayRotatingColors(bool newDisplay) {
+  const uint8_t stepsCount = 50;
+  const uint32_t colors[] = {YELLOW, RED, RED, RED, RED};
+  static uint8_t shift = 0;
   static uint8_t step = 0;
   if (newDisplay) {
     step = 0;
+    shift = 0;
   }
   if (skipSteps(20, newDisplay)) {
-    for (uint8_t branch = 0; branch < BRANCHES; branch++) {
-      uint16_t offset = branch;
-      offset<<= 8;
-      offset/= BRANCHES;
-      stars.setBranch(branch, wheel(step+offset));
-    }
+    for (uint8_t branch = 0; branch < BRANCHES; branch++)
+      stars.setBranch(branch, transitionColor(step, stepsCount, colors[(branch + shift) % BRANCHES], colors[(branch + shift + 1) % BRANCHES]));
     stars.commit();
     step++;
+    if (step >= stepsCount) {
+      step = 0;
+      shift++;
+      if (shift >= BRANCHES)
+        shift = 0;
+    }
   }
 }
 
 /**
  * Display one step
- * (no wait)
+ * (no wait) of a given mode
  */
-void display() {
-  switch(currentMode) {
+void display(uint8_t mode, bool newDisplay) {
+  switch(mode) {
+    case MODE_ALL:
+      displayAll(newDisplay);
+      break;
     case MODE_WHITE:
-      displayWhite(newMode);
+      displayWhite(newDisplay);
       break;
     case MODE_COLORS:
-      displayColors(newMode);
+      displayColors(newDisplay);
       break;
     case MODE_BLINKING_WHITE:
-      displayBlinkingWhite(newMode);
+      displayBlinkingWhite(newDisplay);
       break;
     case MODE_SHIFTING_COLORS:
-      displayShiftingColors(newMode);
+      displayShiftingColors(newDisplay);
       break;
     case MODE_ROTATING_COLORS:
-      displayRotatingColors(newMode);
+      displayRotatingColors(newDisplay);
       break;
   }
+}
+
+/**
+ * Display one step
+ * (no wait) of the current mode
+ */
+void display() {
+  display(currentMode, newMode);
   newMode = false;
 }
 
