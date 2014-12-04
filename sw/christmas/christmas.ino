@@ -50,36 +50,6 @@ bool buttonPushed = false;
 uint16_t buttonChangedSteps = 0;
 
 /**
- * Mix 2 colors together.
- * If step = 0, this is color1, if step = maxStep, this is color2, between, this is a mix
- */
-uint32_t transitionColor(uint8_t step, uint8_t maxStep, uint32_t color1, uint32_t color2 = 0) {
-  uint16_t r1, g1, b1, r2, g2, b2;
-  r1 = (uint8_t) (color1 >> 16); g1 = (uint8_t) (color1 >> 8); b1 = (uint8_t) color1;
-  r2 = (uint8_t) (color2 >> 16); g2 = (uint8_t) (color2 >> 8); b2 = (uint8_t) color2;
-  r1 *= maxStep - step; g1*= maxStep - step; b1 *= maxStep - step;
-  r2 *= step; g2*= step; b2 *= step;
-  r1+= r2; g1+= g2; b1+= b2;
-  r1/= maxStep; g1/= maxStep; b1/= maxStep;
-  return stars.color(r1, g1, b1);
-}
-
-/**
- * Wheel of simple colors
- */
-uint32_t wheel(uint8_t wheelPos) {
-  if(wheelPos < 85) {
-    return stars.color(wheelPos * 3, 255 - wheelPos * 3, 0);
-  } else if(wheelPos < 170) {
-    wheelPos -= 85;
-    return stars.color(255 - wheelPos * 3, 0, wheelPos * 3);
-  } else {
-    wheelPos -= 170;
-    return stars.color(0, wheelPos * 3, 255 - wheelPos * 3);
-  }
-}
-
-/**
  * Utility to do something every n steps.
  * Returns true when cleared.
  * Returns true every n calls.
@@ -188,25 +158,16 @@ void displayShiftingColors(bool newDisplay) {
  * all stars are identical
  */
 void displayRotatingColors(bool newDisplay) {
-  const uint8_t stepsCount = 50;
-  const uint32_t colors[] = {YELLOW, RED, RED, RED, RED};
+  const uint32_t colors[] = {YELLOW, RED, PURPLE, BLUE, GREEN};
   static uint8_t shift = 0;
-  static uint8_t step = 0;
   if (newDisplay) {
-    step = 0;
     shift = 0;
   }
-  if (skipSteps(20, newDisplay)) {
+  if (skipSteps(300, newDisplay)) {
     for (uint8_t branch = 0; branch < BRANCHES; branch++)
-      stars.setBranch(branch, transitionColor(step, stepsCount, colors[(branch + shift) % BRANCHES], colors[(branch + shift + 1) % BRANCHES]));
+      stars.setBranch(branch, colors[(branch + shift) % BRANCHES]);
     stars.commit();
-    step++;
-    if (step >= stepsCount) {
-      step = 0;
-      shift++;
-      if (shift >= BRANCHES)
-        shift = 0;
-    }
+    shift = (shift + 1) % BRANCHES;
   }
 }
 
