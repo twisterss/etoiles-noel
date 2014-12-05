@@ -39,6 +39,18 @@ uint32_t Stars::color(uint8_t red, uint8_t green, uint8_t blue) {
   return strip.Color(red, green, blue);
 }
 
+uint8_t Stars::redComp(uint32_t color) {
+  return (color >> 16) & 255;
+}
+
+uint8_t Stars::greenComp(uint32_t color) {
+  return (color >> 8) & 255;
+}
+
+uint8_t Stars::blueComp(uint32_t color) {
+  return color & 255;
+}
+
 uint8_t Stars::stars() {
   return stars_count;
 }
@@ -48,6 +60,6 @@ uint8_t Stars::branches() {
 }
 
 uint32_t Stars::getLedFromLocation(uint8_t star, uint8_t branch) {
-  return star * branches_count + branch;
+  return star * branches_count + ((branch + 1) % branches_count);
 }
 

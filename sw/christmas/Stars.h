@@ -80,6 +80,21 @@ class Stars {
    * Get a color properly coded
    */
   uint32_t color(uint8_t red, uint8_t green, uint8_t blue);
+
+  /**
+   * Get the red component of a color
+   */
+  uint8_t redComp(uint32_t color);
+
+  /**
+   * Get the green component of a color
+   */
+  uint8_t greenComp(uint32_t color);
+
+  /**
+   * Get the blue component of a color
+   */
+  uint8_t blueComp(uint32_t color);
   
   /**
    * Get the number of stars
