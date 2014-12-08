@@ -4,27 +4,27 @@
  * and print the blocker once (print2 mode)
  */
 
-// Display mode (all, view, print1, print2)
-mode = "view";
+// Display mode
+mode = "view"; // [all: Full star preview, view: Inside preview, print1:Half star, print2: Binder]
 
-// Number of branches of the start
-branches = 5;
+// Number of branches of the star
+branches = 5; // [3:50]
 // Internal radius of the star
-int_radius = 21;
+int_radius = 21; // [1:500]
 // External radius of the star
-ext_radius = 60;
+ext_radius = 60; // [1:500]
 // Height of the half star
-height = 20;
+height = 20; // [1:500]
 // Width of the star container
-width = 2;
+width = 2; // [1:10]
 // Diameter of the cable space
-cable_diam = 5;
+cable_diam = 5; // [1:20]
 // Diameter of the holding wire
-wire_diam = 2;
+wire_diam = 2; // [1:10]
 
 // Resolution
-$fa = 3; // Minimum angle (lower = higher max resolution, def 12)
-$fs = 0.5; // Max fragment size (lower = higher min resolution, def 2)
+$fa = 3; // Minimum angle
+$fs = 0.5; // Maximum fragment size
 
 /**
  * Draw one star branch
