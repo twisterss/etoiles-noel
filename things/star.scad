@@ -22,6 +22,8 @@ cable_diam = 5; // [1:20]
 // Diameter of the holding wire
 wire_diam = 2; // [1:10]
 
+/* [Hidden] */
+
 // Resolution
 $fa = 3; // Minimum angle
 $fs = 0.5; // Maximum fragment size
